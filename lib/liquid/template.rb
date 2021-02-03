@@ -72,6 +72,8 @@ module Liquid
       attr_accessor :file_system
       Template.file_system = BlankFileSystem.new
 
+      attr_accessor :precompiler
+
       attr_accessor :tags
       Template.tags = TagRegistry.new
       private :tags=
@@ -107,6 +109,7 @@ module Liquid
     # Returns self for easy chaining
     def parse(source, options = {})
       parse_context = configure_options(options)
+      source        = Template.precompiler.compile(source) if Template.precompiler
       tokenizer     = parse_context.new_tokenizer(source, start_line_number: @line_numbers && 1)
       @root         = Document.parse(tokenizer, parse_context)
       self
